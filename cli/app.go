@@ -15,66 +15,73 @@ type App struct {
 	parsedCommands     []string
 }
 
-func (c *App) parseArgs() error {
-	c.parsedParameters = make(map[string]string)
-	c.parsedCommands = make([]string, 0, len(c.args))
+func (a *App) parseArgs() error {
+	a.parsedParameters = make(map[string]string)
+	a.parsedCommands = make([]string, 0, len(a.args))
 	isParamVal := false
 	paramName := ""
-	for _, arg := range c.args {
+	for _, arg := range a.args {
 		// check if it is a parameter
 		if strings.HasPrefix(arg, "-") {
 			if equalsOp := strings.Split(arg, "="); len(equalsOp) == 2 {
-				c.parsedParameters[equalsOp[0]] = equalsOp[1]
+				a.parsedParameters[equalsOp[0]] = equalsOp[1]
 				continue
 			}
 
 			paramName = arg[1:]
 			isParamVal = true
-			c.parsedParameters[paramName] = ""
+			a.parsedParameters[paramName] = ""
 			continue
 		}
 
 		// if previous one was a parameter this one might be the value
 		if isParamVal {
-			c.parsedParameters[paramName] = arg
+			a.parsedParameters[paramName] = arg
 			isParamVal = false
 			continue
 		}
 
-		c.parsedCommands = append(c.parsedCommands, arg)
+		a.parsedCommands = append(a.parsedCommands, arg)
 	}
 
 	return nil
 }
 
-func (c *App) RegisterCommand(name string, desc string, comBuilder func() Command) {
-	if c.registeredCommands == nil {
-		c.registeredCommands = make(map[string]Command)
+func (a *App) RegisterCommand(name string, desc string, comBuilder func() Command) {
+	if a.registeredCommands == nil {
+		a.registeredCommands = make(map[string]Command)
 	}
-	c.registeredCommands[name] = comBuilder()
+	a.registeredCommands[name] = comBuilder()
 }
 
-func (c *App) Run() int {
-	if c.args == nil {
-		c.args = os.Args[1:]
+func (a *App) Run() int {
+	if a.args == nil {
+		a.args = os.Args[1:]
 	}
-	if err := c.parseArgs(); err != nil {
+
+	if _, ok := a.registeredCommands["version"]; !ok {
+		a.RegisterCommand("version", "the version of the app", func() Command {
+			return VersionCommand{}
+		})
+	}
+
+	if err := a.parseArgs(); err != nil {
 		fmt.Printf("could not parse parameters: %s \n", err.Error())
 		return 1
 	}
 
-	if len(c.parsedCommands) == 0 {
+	if len(a.parsedCommands) == 0 {
 		// render help text
 		return 0
 	}
 
-	firstCommand := c.parsedCommands[0]
-	if _, ok := c.registeredCommands[firstCommand]; !ok {
+	firstCommand := a.parsedCommands[0]
+	if _, ok := a.registeredCommands[firstCommand]; !ok {
 		// command not found
 		fmt.Printf("unknown command: %s", firstCommand)
 		return 1
 	}
 
-	command := c.registeredCommands[firstCommand]
-	return command.Run(c.parsedParameters)
+	command := a.registeredCommands[firstCommand]
+	return command.Run(a, a.parsedParameters)
 }

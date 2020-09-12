@@ -30,14 +30,14 @@ func TestCommmandBuilder() cli.Command {
 	return TestCommand{}
 }
 
-func (v TestCommand) Run(param map[string]string) int {
+func (v TestCommand) Run(app *cli.App, param map[string]string) int {
 	loops := 1
 	if loopsText, ok := param["loops"]; ok {
 		loops, _ = strconv.Atoi(loopsText)
 	}
 
 	for i := 0; i < loops; i++ {
-		fmt.Printf("This is a test command %d \n", i)
+		fmt.Printf("This is a test command for %s : %d \n", app.Name, i)
 	}
 
 	return 0
