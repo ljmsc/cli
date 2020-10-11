@@ -1,3 +1,3 @@
 module github.com/ljmsc/cli
 
-go 1.14
+go 1.15
