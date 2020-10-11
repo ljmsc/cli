@@ -18,16 +18,12 @@ func main() {
 		Version: "1.0.0",
 	}
 	// app.RegisterCommandWithFlag("start", startAppHandler, cli.Flag{})
-	app.RegisterCommand("test", "this is for testing", TestCommmandBuilder)
+	app.RegisterCommand("test", "this is for testing", TestCommand{})
 
 	os.Exit(app.Run())
 }
 
 type TestCommand struct {
-}
-
-func TestCommmandBuilder() cli.Command {
-	return TestCommand{}
 }
 
 func (v TestCommand) Run(app *cli.App, param map[string]string) int {

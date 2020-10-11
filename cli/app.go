@@ -47,11 +47,18 @@ func (a *App) parseArgs() error {
 	return nil
 }
 
-func (a *App) RegisterCommand(name string, desc string, comBuilder func() Command) {
+func (a *App) RegisterCommandFunc(name string, desc string, commandFunc func() error) {
+	a.RegisterCommand(name, desc, &SimpleCommand{Command: commandFunc})
+}
+
+func (a *App) RegisterCommand(name string, desc string, command Command) {
+	if len(name) == 0 {
+		panic("name can't be empty")
+	}
 	if a.registeredCommands == nil {
 		a.registeredCommands = make(map[string]Command)
 	}
-	a.registeredCommands[name] = comBuilder()
+	a.registeredCommands[name] = command
 }
 
 func (a *App) Run() int {
@@ -60,9 +67,7 @@ func (a *App) Run() int {
 	}
 
 	if _, ok := a.registeredCommands["version"]; !ok {
-		a.RegisterCommand("version", "the version of the app", func() Command {
-			return VersionCommand{}
-		})
+		a.RegisterCommand("version", "the version of the app", VersionCommand{})
 	}
 
 	if err := a.parseArgs(); err != nil {
