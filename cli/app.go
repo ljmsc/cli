@@ -47,7 +47,7 @@ func (a *App) parseArgs() error {
 	return nil
 }
 
-func (a *App) RegisterCommandFunc(name string, desc string, commandFunc func() error) {
+func (a *App) RegisterCommandFunc(name string, desc string, commandFunc func(app *App, param map[string]string) error) {
 	a.RegisterCommand(name, desc, &SimpleCommand{Command: commandFunc})
 }
 

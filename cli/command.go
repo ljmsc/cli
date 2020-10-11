@@ -7,11 +7,11 @@ type Command interface {
 }
 
 type SimpleCommand struct {
-	Command func() error
+	Command func(app *App, param map[string]string) error
 }
 
 func (s *SimpleCommand) Run(app *App, param map[string]string) int {
-	if err := s.Command(); err != nil {
+	if err := s.Command(app, param); err != nil {
 		fmt.Printf("%s", err)
 		return 1
 	}
