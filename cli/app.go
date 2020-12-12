@@ -24,7 +24,9 @@ func (a *App) parseArgs() error {
 		// check if it is a parameter
 		if strings.HasPrefix(arg, "-") {
 			if equalsOp := strings.Split(arg, "="); len(equalsOp) == 2 {
-				a.parsedParameters[equalsOp[0]] = equalsOp[1]
+				if len(equalsOp[0]) > 1 {
+					a.parsedParameters[equalsOp[0][1:]] = equalsOp[1]
+				}
 				continue
 			}
 
@@ -76,7 +78,7 @@ func (a *App) Run() int {
 	}
 
 	if len(a.parsedCommands) == 0 {
-		// render help text
+		//todo: render help text
 		return 0
 	}
 
