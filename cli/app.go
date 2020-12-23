@@ -63,7 +63,7 @@ func (a *App) RegisterCommand(name string, desc string, command Command) {
 	a.registeredCommands[name] = command
 }
 
-func (a *App) Run() int {
+func (a *App) Run() error {
 	if a.args == nil {
 		a.args = os.Args[1:]
 	}
@@ -73,20 +73,18 @@ func (a *App) Run() int {
 	}
 
 	if err := a.parseArgs(); err != nil {
-		fmt.Printf("could not parse parameters: %s \n", err.Error())
-		return 1
+		return fmt.Errorf("could not parse parameters: %w", err)
 	}
 
 	if len(a.parsedCommands) == 0 {
 		//todo: render help text
-		return 0
+		return nil
 	}
 
 	firstCommand := a.parsedCommands[0]
 	if _, ok := a.registeredCommands[firstCommand]; !ok {
 		// command not found
-		fmt.Printf("unknown command: %s", firstCommand)
-		return 1
+		return fmt.Errorf("unknown command: %s", firstCommand)
 	}
 
 	command := a.registeredCommands[firstCommand]
