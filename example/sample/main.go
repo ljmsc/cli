@@ -20,13 +20,16 @@ func main() {
 	// app.RegisterCommandWithFlag("start", startAppHandler, cli.Flag{})
 	app.RegisterCommand("test", "this is for testing", TestCommand{})
 
-	os.Exit(app.Run())
+	if err := app.Run(); err != nil {
+		fmt.Printf("Error: %s", err.Error())
+		os.Exit(1)
+	}
 }
 
 type TestCommand struct {
 }
 
-func (v TestCommand) Run(app *cli.App, param map[string]string) int {
+func (v TestCommand) Run(app *cli.App, param map[string]string) error {
 	loops := 1
 	if loopsText, ok := param["loops"]; ok {
 		loops, _ = strconv.Atoi(loopsText)
@@ -36,5 +39,5 @@ func (v TestCommand) Run(app *cli.App, param map[string]string) int {
 		fmt.Printf("This is a test command for %s : %d \n", app.Name, i)
 	}
 
-	return 0
+	return nil
 }
