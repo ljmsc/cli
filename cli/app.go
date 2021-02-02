@@ -49,11 +49,17 @@ func (a *App) parseArgs() error {
 	return nil
 }
 
-func (a *App) RegisterCommandFunc(name string, desc string, commandFunc func(app *App, param map[string]string) error) {
-	a.RegisterCommand(name, desc, &SimpleCommand{Command: commandFunc})
+func (a *App) help() {
+	for name, command := range a.registeredCommands {
+		fmt.Printf("%s\t\t%s\n", name, command.Help(a))
+	}
 }
 
-func (a *App) RegisterCommand(name string, desc string, command Command) {
+func (a *App) RegisterCommandFunc(name string, commandFunc CommandFunc) {
+	a.RegisterCommand(name, &commandFunc)
+}
+
+func (a *App) RegisterCommand(name string, command Command) {
 	if len(name) == 0 {
 		panic("name can't be empty")
 	}
@@ -69,7 +75,7 @@ func (a *App) Run() error {
 	}
 
 	if _, ok := a.registeredCommands["version"]; !ok {
-		a.RegisterCommand("version", "the version of the app", VersionCommand{})
+		a.RegisterCommand("version", versionCommand)
 	}
 
 	if err := a.parseArgs(); err != nil {
@@ -77,7 +83,7 @@ func (a *App) Run() error {
 	}
 
 	if len(a.parsedCommands) == 0 {
-		//todo: render help text
+		a.help()
 		return nil
 	}
 

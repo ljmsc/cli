@@ -17,8 +17,8 @@ func main() {
 		Name:    "myapp",
 		Version: "1.0.0",
 	}
-	// app.RegisterCommandWithFlag("start", startAppHandler, cli.Flag{})
-	app.RegisterCommand("test", "this is for testing", TestCommand{})
+
+	app.RegisterCommand("test", TestCommand{})
 
 	if err := app.Run(); err != nil {
 		fmt.Printf("Error: %s", err.Error())
@@ -27,6 +27,10 @@ func main() {
 }
 
 type TestCommand struct {
+}
+
+func (v TestCommand) Help(app *cli.App) string {
+	return "this is a test command for testing"
 }
 
 func (v TestCommand) Run(app *cli.App, param map[string]string) error {
