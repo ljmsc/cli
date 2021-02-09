@@ -51,7 +51,7 @@ func (a *App) parseArgs() error {
 
 func (a *App) help() {
 	for name, command := range a.registeredCommands {
-		fmt.Printf("%s\t\t%s\n", name, command.Help(a))
+		fmt.Printf("%s %s\n", name, command.Help(a))
 	}
 }
 
