@@ -7,13 +7,13 @@ import (
 
 type Command interface {
 	Run(app *App, param map[string]string) error
-	Help(app *App) string
+	Help(app *App) Help
 }
 
 type CommandFunc func(app *App, param map[string]string) error
 
-func (s CommandFunc) Help(app *App) string {
-	return ""
+func (s CommandFunc) Help(app *App) Help {
+	return Help{}
 }
 
 func (s CommandFunc) Run(app *App, param map[string]string) error {

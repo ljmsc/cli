@@ -7,12 +7,13 @@ import (
 )
 
 type App struct {
-	Name               string
-	Version            string
-	args               []string
-	registeredCommands map[string]Command
-	parsedParameters   map[string]string
-	parsedCommands     []string
+	Name                  string
+	Version               string
+	args                  []string
+	registeredCommands    map[string]Command
+	registeredCommandDesc map[string]string
+	parsedParameters      map[string]string
+	parsedCommands        []string
 }
 
 func (a *App) parseArgs() error {
@@ -51,11 +52,21 @@ func (a *App) parseArgs() error {
 
 func (a *App) help() {
 	for name, command := range a.registeredCommands {
-		fmt.Printf("%s %s\n", name, command.Help(a))
+		helpText := command.Help(a)
+		helpText.name = name
+		if desc, ok := a.registeredCommandDesc[name]; ok && helpText.Desc == "" {
+			helpText.Desc = desc
+		}
+
+		fmt.Printf("%s\n", helpText)
 	}
 }
 
-func (a *App) RegisterCommandFunc(name string, commandFunc CommandFunc) {
+func (a *App) RegisterCommandFunc(name string, desc string, commandFunc CommandFunc) {
+	if a.registeredCommandDesc == nil {
+		a.registeredCommandDesc = make(map[string]string)
+	}
+	a.registeredCommandDesc[name] = desc
 	a.RegisterCommand(name, &commandFunc)
 }
 

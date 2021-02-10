@@ -29,8 +29,13 @@ func main() {
 type TestCommand struct {
 }
 
-func (v TestCommand) Help(app *cli.App) string {
-	return "this is a test command for testing"
+func (v TestCommand) Help(app *cli.App) cli.Help {
+	return cli.Help{
+		Desc: "this is a test command for testing",
+		Parameters: []cli.Parameter{
+			{Name: "loops", Desc: "amount of loops"},
+		},
+	}
 }
 
 func (v TestCommand) Run(app *cli.App, param map[string]string) error {
